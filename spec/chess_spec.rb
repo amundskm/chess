@@ -33,19 +33,125 @@ RSpec.describe Board do
     end
 
 end
-                
-
-
 
 #   get_input
-
+Rspec.describe Peices do
 #    pawn_move
-#    rook_move
-#    bishop_move
-#    knight_move
-#    king_move
-#    queen_move
+    describe "#pawn_move"
+        context "when a pawn is called" do
+            subject {described_class.new("pawn")}
+            it "should be able to move 2 spaces forward on first turn" do
+                #expect this to be true
+            end
 
+            it "should be able to move 1 space after the first turn" do
+                #expect this to be true
+            end
+
+            it "should be able to capture a peice that is up and over 1" do
+                #expect this to be true
+            end
+
+            it "should not be able to move to a position that already has a peice there" do
+                #expect this to be false
+            end
+        end
+    end
+#    rook_move
+    describe "#rook_move"
+        context "when a rook is called" do
+            it "should be able to move vertically" do
+            end
+            it "should be able to move horizontally" do
+            end
+            it "should not move past any peices" do
+            end
+            it "should be able to capture an enemy peice" do
+            end
+            it "should not land on a space that already has the same players peice already" do
+            end
+        end
+    end
+
+#    bishop_move
+    describe "bishop_move" do
+        context "when a bishop is called" do
+            it "should be able to move up left diagonally" do
+            end
+            it "should be able to move up right diagonally" do
+            end
+            it "should be able to move down left diagonally" do
+            end
+            it "should be able to move down right diagonally" do
+            end
+            it "should not be able to move past any peices" do
+            end
+            it "should be able to capture an enemy peice" do
+            end
+            it "should not land on a space that already has the same players peice already" do
+            end
+        end
+    end
+
+#    knight_move
+    describe "knight_move" do
+        context "when a knight is called" do
+            it "should be able to move (x,y): +2 , +1" do
+            end
+            it "should be able to move (x,y): +1, +2" do
+            end
+            it "should be able to move (x,y): -2, +1" do
+            end
+            it "should be able to move (x,y): -1, +2" do
+            end
+            it "should be able to move (x,y): +2 , -1" do
+            end
+            it "should be able to move (x,y): +1, -2" do
+            end
+            it "should be able to move (x,y): -2, -1" do
+            end
+            it "should be able to move (x,y): -1, -2" do
+            end
+            it "should be able to capture an enemy peice" do
+            end
+            it "should not land on a space that already has the same players peice already" do
+            end
+        end
+    end
+#    king_move
+    describe "#king_move"
+        contect "when a king is called" do
+            it "should move horiztonally 1 space" do
+            end
+            it "should move vertically 1 space" do
+            end
+            it "should move diagonally 1 space" do
+            end
+            it "should not land on a space that already has the same players peice already" do
+            end
+            it "should not put itself in check" do 
+            end
+            it "should be able to capture an enemy peice" do
+            end
+        end
+    end
+#    queen_move
+    describe "#queen_move"
+        contect "when a queen is called" do
+            it "should move horiztonally" do
+            end
+            it "should move vertically" do
+            end
+            it "should move diagonally" do
+            end
+            it "should not land on a space that already has the same players peice already" do
+            end
+            it "should not move past any peices" do 
+            end
+            it "should be able to capture an enemy peice" do
+            end
+        end
+    end
 #    test_input
 
 #    delete_peice
