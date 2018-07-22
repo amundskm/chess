@@ -3,8 +3,8 @@
 require 'rspec'
 require '../lib/chess.rb'
 
-# "when a new Spaces object is created it should have a name,
-# coordinates, and a peice" 
+# NOTES: 
+# when a new Spaces object is created it should have a name, coordinates, and a peice
 
 RSpec.describe Board do
 #   build_board
@@ -35,7 +35,7 @@ RSpec.describe Board do
 end
 
 #   get_input
-Rspec.describe Peices do
+Rspec.describe Game do
 #    pawn_move
     describe "#pawn_move"
         context "when a pawn is called" do
@@ -137,7 +137,7 @@ Rspec.describe Peices do
     end
 #    queen_move
     describe "#queen_move"
-        contect "when a queen is called" do
+        context "when a queen is called" do
             it "should move horiztonally" do
             end
             it "should move vertically" do
@@ -152,6 +152,15 @@ Rspec.describe Peices do
             end
         end
     end
+
+end
+
+Rspec.describe Gameplay do
+
+    describe "#test_input" do
+        context "when an player inputs a move" do
+            it "should be a legal move" do
+                
 #    test_input
 
 #    delete_peice
