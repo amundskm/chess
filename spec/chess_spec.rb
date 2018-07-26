@@ -3,45 +3,79 @@
 require 'rspec'
 require '../lib/chess.rb'
 
-# NOTES: 
-# when a new Spaces object is created it should have a name, coordinates, and a peice
+Rspec.describe Piece do
+    describe "move" do
+        context "when a peice is moved to a different space" do
+            it "should incriment <num_move> by 1" do
+                new_piece = Piece.new(pawn, white)
+                new_peice.move
+                expect(num_move).to eq 1
+            end
+        end
+    end
+end
 
 RSpec.describe Board do
-#   build_board
-    describe "#build_board" do
-        context "when building board" do
-            subject {described_class.new()}
-            it "should create a board 8 X 8 with 64 objects, one for each space on the board." do
-                subject.build_board
-                expect(subject.spaces.length).to eq 64
-            end
-
-            it "each space should have a name" do
-                subject.build_board
-                name = subject.spaces[0].name
-                expect(name).to eq "A1"
+    subject{ described_class.new("a1", 0, 0) }
+    describe "#add_piece" do
+        context "when adding a peice in on a space" do
+            it "should return the Piece object that is on that space" do
+                
+                new_rook = Piece.new("rook, white")
+                subject.add_piece(new_rook)
+                expect(new_space.piece).to eq new_rook
             end
         end
     end
 
-#   draw_board
-    describe "#draw_board" do
-        context "when drawing board" do
-            subject {described_class.new()}
-            #test that the board is drawn and looks correct
+    describe "#delete" do
+        context "when a peice is moved to a different space, or removed from the game" do
+            it "should remove the piece from the space" do
+                new_rook = Piece.new("rook, white")
+                subject.add_piece(new_rook)
+                subject.delete
+                expect(subject.piece).to eq nil
+            end
+        end
+    end
+
+    describe  "self.find_space" do
+        context "when searching by name for a space" do
+            it "should return a space of the same name" do
+                subject.spaces << new_space
+                expect(Board.find_space("a1")).to eq subject]
+            end
+        end
+    end
+
+    describe "self.add_space" do
+        context "when a space is created" do
+            it "should add the new space to the class array @@spaces" do
+                Board.add_space(subject)
+                expect(Board.find_space("a1")).to eq subject
+            end
+        end
+    end
+
+    describe "self.get_spaces" do
+        context "when looking for the array of all the spaces" do
+            it "should return the class array @@spaces" do
+                Board.add_space(subject)
+                expect(Board.get_spaces[0]).to eq subject
+            end
         end
     end
 
 end
 
 #   get_input
-Rspec.describe Game do
+Rspec.describe Chess do
 #    pawn_move
     describe "#pawn_move"
         context "when a pawn is called" do
-            subject {described_class.new("pawn")}
+
             it "should be able to move 2 spaces forward on first turn" do
-                #expect this to be true
+                
             end
 
             it "should be able to move 1 space after the first turn" do
@@ -153,10 +187,6 @@ Rspec.describe Game do
         end
     end
 
-end
-
-Rspec.describe Gameplay do
-
     describe "#test_input" do
         context "when an player inputs a move" do
             it "should be a legal move" do
@@ -166,3 +196,5 @@ Rspec.describe Gameplay do
 #    delete_peice
 #    check
 #    checkmate
+end
+
