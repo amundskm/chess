@@ -70,9 +70,10 @@ end
 
 #   get_input
 Rspec.describe Chess do
-    subject{ described_class.new }
+    
 
     describe "build_board" do
+        subject{ described_class.new }
         context "when the game is started, create all the spaces on the board" do
             it "should create 64 spaces 8 X 8" do
                 expect(Board.get_spaces.length).to eq 64
@@ -81,6 +82,7 @@ Rspec.describe Chess do
     end
 
     describe "build_pieces" do
+        subject{ described_class.new }
         context "when the game is started, create and place all chess peices on correct spaces" do
             it "should put a rook on 'a1'" do
                 space = Board.find_space('a1')
@@ -90,6 +92,7 @@ Rspec.describe Chess do
     end
 
     describe "move_piece" do
+        subject{ described_class.new }
         context "when a player wants to move a piece, and it is determined to be a legal move" do
             it "should add the piece to the new space, and delete it from the old space" do
                 subject.move_piece('a2', 'a4')
@@ -102,7 +105,8 @@ Rspec.describe Chess do
     end
 
 #    pawn_move
-    describe "#pawn_move"
+    describe "#pawn_move" do
+        subject{ described_class.new }
         context "when a pawn is called" do
             
             it "should be able to move 2 spaces forward on first turn" do
@@ -128,7 +132,8 @@ Rspec.describe Chess do
         end
     end
 #    rook_move
-    describe "#rook_move"
+    describe "#rook_move" do 
+        subject{ described_class.new }
         context "when a rook is called" do
             it "should be able to move vertically" do
                 Board.find_space('a2').delete
@@ -154,6 +159,7 @@ Rspec.describe Chess do
 
 #    bishop_move
     describe "bishop_move" do
+        subject{ described_class.new }
         context "when a bishop is called" do
             it "should be able to move up left diagonally" do
                 Board.find_space('b2').delete
@@ -188,6 +194,7 @@ Rspec.describe Chess do
 
 #    knight_move
     describe "knight_move" do
+        subject{ described_class.new }
         context "when a knight is called" do
             it "should be able to move (x,y): +2 , +1" do
                 Board.find_space('d2').delete
@@ -237,7 +244,8 @@ Rspec.describe Chess do
         end
     end
 #    king_move
-    describe "#king_move"
+    describe "#king_move" do
+        subject{ described_class.new }
         contect "when a king is called" do
             it "should move horiztonally 1 space" do
                 subject.move_piece('e1','e4')
@@ -269,7 +277,8 @@ Rspec.describe Chess do
         end
     end
 #    queen_move
-    describe "#queen_move"
+    describe "#queen_move" do
+        subject{ described_class.new }
         context "when a queen is called" do
             it "should move horiztonally" do
                 subject.move_piece('d1','d4')
@@ -299,20 +308,71 @@ Rspec.describe Chess do
     end
 
     describe "#test_input" do
+        subject{ described_class.new }
         context "when an player inputs a move" do
             it "should be a legal move" do
             end
         end
     end
-                
-#    test_input
-#    capture
-#    delete_peice
-#    check
-#    checkmate
-#    promotion
-#    split
-#    get_input
-#    promotion_input
+
+    describe "#capture" do
+        subject{ described_class.new }
+        context "When a piece is legally moved to a position already occupied by an enemy piece" do
+            it "should delete the enemy piece that is there and add the new piece to the space, and remove the new piece from its original position" do
+                Board.find_space('a2').delete
+                subject.capture('a1', 'a7')
+                expect(Board.find_space('a1').peice).to eq nil
+                expect(Board.find_space('a1').peice.name).to eq 'rook'
+                expect(Board.find_space('a1').peice.color).to eq 'white'
+            end
+        end
+    end
+
+    describe "promotion" do
+        subject{ described_class.new }
+        contect "when a pawn reaches the last row of the enemy's side of the board" do
+            it "can be promoted to any piece the player desires" do
+                Board.find_space('a7').delete
+                Board.find_space('a8').delete
+                subject.move_piece('a2', 'a8')
+                subject.promotion('a8', 'queen')
+                expect(Board.find_space('a8').piece.name).to eq 'queen')
+            end
+        end
+    end
+
+    describe "#split" do
+        subject{ described_class.new }
+        context "A user's correct input will be in the form of space_name to space_name" do
+            it "should break the string into 2 space_names" do
+                expect(subject.split("a2 to a4")).to eq ['a2', 'a4']
+            end
+        end
+    end
+
+    describe "check" do
+        subject{ described_class.new }
+        context "when a king can be attacked on the next turn, but can escape a king is in check" do
+            it "should return the king color if the king can be attacked" do
+                expect(subject.check).to be false
+                subject.move_piece('e1', 'e6')
+                expect(subject.check).to eq 'white'
+            end
+        end
+    end
+
+    describe "checkmate" do
+        subject{ described_class.new }
+        context "when a king can be attacked on the next, and can't escape turn a king is in check" do
+            it "should return the king color if the king can be attacked" do
+                expect(subject.check).to be false
+                Board.find_space('e7').delete
+                subject.move_piece('d1', 'e7')
+                subject.move_pieve('a1', 'e6')
+                expect(subject.check).to eq 'black'
+            end
+        end
+    end
+
 end
 
