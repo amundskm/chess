@@ -330,22 +330,13 @@ Rspec.describe Chess do
 
     describe "promotion" do
         subject{ described_class.new }
-        contect "when a pawn reaches the last row of the enemy's side of the board" do
+        context "when a pawn reaches the last row of the enemy's side of the board" do
             it "can be promoted to any piece the player desires" do
                 Board.find_space('a7').delete
                 Board.find_space('a8').delete
                 subject.move_piece('a2', 'a8')
                 subject.promotion('a8', 'queen')
                 expect(Board.find_space('a8').piece.name).to eq 'queen')
-            end
-        end
-    end
-
-    describe "#split" do
-        subject{ described_class.new }
-        context "A user's correct input will be in the form of space_name to space_name" do
-            it "should break the string into 2 space_names" do
-                expect(subject.split("a2 to a4")).to eq ['a2', 'a4']
             end
         end
     end

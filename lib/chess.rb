@@ -53,11 +53,7 @@ class Chess
     def initialize
         build_board
         create_peices
-        gameplay
-    end
-
-    def add_entry(pos, player)
-
+        #gameplay
     end
     
     def build_board
@@ -65,21 +61,21 @@ class Chess
             8.times do |x|
             letter = (x + 97).chr
                 space_name = letter + (y+1).to_s
-                subject.add_space(subject.new(space_name, x ,y))
+                Board.add_space(Board.new(space_name, x ,y))
             end
         end
     end
 
     def create_peices
         #add black peices to board
-        subject.find_space('a1').add_piece(Piece.new('rook', 'white'))
-        subject.find_space('h1').add_piece(Piece.new('rook', 'white'))
-        subject.find_space('b1').add_piece(Piece.new('knight', 'white'))
-        subject.find_space('g1').add_piece(Piece.new('knight', 'white'))
-        subject.find_space('c1').add_piece(Piece.new('bishop', 'white'))
-        subject.find_space('f1').add_piece(Piece.new('bishop', 'white'))
-        subject.find_space('d1').add_piece(Piece.new('queen', 'white'))
-        subject.find_space('e1').add_piece(Piece.new('king', 'white'))
+        Board.find_space('a1').add_piece(Piece.new('rook', 'white'))
+        Board.find_space('h1').add_piece(Piece.new('rook', 'white'))
+        Board.find_space('b1').add_piece(Piece.new('knight', 'white'))
+        Board.find_space('g1').add_piece(Piece.new('knight', 'white'))
+        Board.find_space('c1').add_piece(Piece.new('bishop', 'white'))
+        Board.find_space('f1').add_piece(Piece.new('bishop', 'white'))
+        Board.find_space('d1').add_piece(Piece.new('queen', 'white'))
+        Board.find_space('e1').add_piece(Piece.new('king', 'white'))
         8.times do |num|
             letter = (num + 97).chr
             name = letter + 2.to_s
@@ -87,47 +83,56 @@ class Chess
         end
 
         #add black peices to board
-        subject.find_space('a8').add_piece(Piece.new('rook', 'black'))
-        subject.find_space('h8').add_piece(Piece.new('rook', 'black'))
-        subject.find_space('b8').add_piece(Piece.new('knight', 'black'))
-        subject.find_space('g8').add_piece(Piece.new('knight', 'black'))
-        subject.find_space('c8').add_piece(Piece.new('bishop', 'black'))
-        subject.find_space('f8').add_piece(Piece.new('bishop', 'black'))
-        subject.find_space('d8').add_piece(Piece.new('queen', 'black'))
-        subject.find_space('e8').add_piece(Piece.new('king', 'black'))
+        Board.find_space('a8').add_piece(Piece.new('rook', 'black'))
+        Board.find_space('h8').add_piece(Piece.new('rook', 'black'))
+        Board.find_space('b8').add_piece(Piece.new('knight', 'black'))
+        Board.find_space('g8').add_piece(Piece.new('knight', 'black'))
+        Board.find_space('c8').add_piece(Piece.new('bishop', 'black'))
+        Board.find_space('f8').add_piece(Piece.new('bishop', 'black'))
+        Board.find_space('d8').add_piece(Piece.new('queen', 'black'))
+        Board.find_space('e8').add_piece(Piece.new('king', 'black'))
         8.times do |num|
             letter = (num + 97).chr
             name = letter + 7.to_s
-            subject.find_space(name).add_piece(Piece.new('pawn', 'black'))
+            Board.find_space(name).add_piece(Piece.new('pawn', 'black'))
         end
     end
 
-    def draw_board
-        subject.get_spaces.each do |space|
-            if space.piece
-                puts "#{space.piece.name}, #{space.piece.color}" 
-            else
-                puts "empty"
-            end
+    # def draw_board
+    #     Board.get_spaces.each do |space|
+    #         if space.piece
+    #             puts "#{space.piece.name}, #{space.piece.color}" 
+    #         else
+    #             puts "empty"
+    #         end
 
+    #     end
+    # end
+
+    # def gameplay
+    #     cont = false
+    #     while cont == false
+    #         [1,2].each do |player|
+    #             cont = game_over
+    #             break if cont != false
+    #             draw_board
+    #             add_entry(get_input(player), player)
+    #         end
+    #     end
+    #     return cont
+    # end
+
+    def get_input
+        while true
+            puts "what space would you like to move and where"
+            puts "input in the format <space_name> to <space_name>"
+            puts "example: a2 to a3"
+            input= gets.chomp
+            check = input.scan(/(\w)(\d) to (\w)(\d)/).flatten
+            return [check[0] + check[1], check[2] + check[3]] if check.length == 4
+            puts "what you have entered does not have the correct format. Please try again."
         end
-    end
-
-    def gameplay
-        cont = false
-        while cont == false
-            [1,2].each do |player|
-                cont = game_over
-                break if cont != false
-                draw_board
-                add_entry(get_input(player), player)
-            end
-        end
-        return cont
-    end
-
-    #TOD0: get_input
-    #TODO: break_input
+    end 
     #TODO: test_input
     #TODO: pawn_move
     #TODO: rook_move
@@ -137,7 +142,8 @@ class Chess
     #TODO: king_move
 end
 
-
+new_game = Chess.new
+puts new_game.get_input
 
 
 
