@@ -3,7 +3,7 @@
 require 'rspec'
 require '../lib/chess.rb'
 
-Rspec.describe Piece do
+describe Piece do
     describe "move" do
         context "when a peice is moved to a different space" do
             it "should incriment <num_move> by 1" do
@@ -15,7 +15,7 @@ Rspec.describe Piece do
     end
 end
 
-RSpec.describe Board do
+describe Board do
     subject{ described_class.new("a1", 0, 0) }
     describe "#add_piece" do
         context "when adding a peice in on a space" do
@@ -68,9 +68,7 @@ RSpec.describe Board do
 
 end
 
-#   get_input
-Rspec.describe Chess do
-    
+describe Chess do
 
     describe "build_board" do
         subject{ described_class.new }
