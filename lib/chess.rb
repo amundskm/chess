@@ -23,6 +23,11 @@ class Board
         @x = x
         @y = y
         @piece = nil
+        @@spaces << self
+    end
+
+    def self.empty
+        @@spaces = []
     end
 
     def add_piece(unit)
@@ -33,13 +38,9 @@ class Board
         @piece = nil
     end
 
-    def self.add_space(space)
-        @@spaces << space
-    end
-
     def self.find_space(name)
         @@spaces.each do |space|
-            return space if space.name == name
+            return space if space.name === name
         end
     end
 
@@ -51,22 +52,20 @@ end
 class Chess
     #create new game of chess
     def initialize
-        build_board
-        create_peices
-        #gameplay
+        Board.empty
     end
-    
+
     def build_board
         8.times do |y|
             8.times do |x|
             letter = (x + 97).chr
                 space_name = letter + (y+1).to_s
-                Board.add_space(Board.new(space_name, x ,y))
+                Board.new(space_name, x ,y)
             end
         end
     end
 
-    def create_peices
+    def build_pieces
         #add black peices to board
         Board.find_space('a1').add_piece(Piece.new('rook', 'white'))
         Board.find_space('h1').add_piece(Piece.new('rook', 'white'))
@@ -110,6 +109,14 @@ class Chess
     #     end
     # end
 
+    def move_piece(start, finish)
+        piece = start.piece
+        piece.move
+        start.delete
+        finish.piece = piece
+
+    end
+
     # def gameplay
     #     cont = false
     #     while cont == false
@@ -131,7 +138,8 @@ class Chess
             puts "what space would you like to move and where"
             puts "input in the format <space_name> to <space_name>"
             puts "example: a2 to a3"
-            input= gets.chomp
+            #input= gets.chomp
+            input = "a2 to a3"
             check = input.scan(/(\w)(\d) to (\w)(\d)/).flatten
             start = check[0] + check[1]
             finish = check[2] + check[2]
@@ -171,13 +179,11 @@ class Chess
     def pawn_move(start, finish)
         # INPUT: start = starting space, finish = ending space
         # OUTPUT: boolean if it is a legal move
-
         
         color = start.piece.color
         x_dist = start.x - finish.x
-
-        (color == white)? (y_dist = start.y - finish.y) : (y_dist = finish.y - start.y)
-
+        
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y) 
         return true if (x_dist == 1) && (y_dist == 1) && (finish.piece)
         return true if (x_dist == 0) && (y_dist == 2) && (finish.piece == nil) && (start.piece.num_moves == 0)
         return true if (x_dist == 0) && (y_dist == 1) && (finish.piece == nil)
@@ -192,10 +198,6 @@ class Chess
     #TODO: queen_move
     #TODO: king_move
 end
-
-new_game = Chess.new
-puts new_game.get_input
-
 
 
                 
