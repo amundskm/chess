@@ -98,6 +98,7 @@ class Chess
         end
     end
 
+        #TODO draw board should actually create a map of the board in the command prompt
     # def draw_board
     #     Board.get_spaces.each do |space|
     #         if space.piece
@@ -123,18 +124,68 @@ class Chess
     # end
 
     def get_input
+        # INPUT: none
+        # OUTPUT: 2 part string array, first part the space the player wants move from, second
+        # part the splace the player wants to move to.
         while true
             puts "what space would you like to move and where"
             puts "input in the format <space_name> to <space_name>"
             puts "example: a2 to a3"
             input= gets.chomp
             check = input.scan(/(\w)(\d) to (\w)(\d)/).flatten
-            return [check[0] + check[1], check[2] + check[3]] if check.length == 4
+            start = check[0] + check[1]
+            finish = check[2] + check[2]
+            return start, finish if check.length == 4
             puts "what you have entered does not have the correct format. Please try again."
         end
-    end 
-    #TODO: test_input
-    #TODO: pawn_move
+    end
+
+    def test_input(start, finish, player)
+        # INPUT: start = string, name of starting space finish = string, name of ending space
+        # OUTPUT: returns false if it is not a legal move
+
+        space_start = Board.find_space(start)
+        space_end = Board.find_space(finish)
+        piece = space_start.piece
+
+        unless piece.color == player
+            return false
+        end
+
+        case piece.name
+        when "pawn"
+            return pawn_move(space_start, space_end)
+        when "rook"
+            return rook(space_start, space_end)
+        when "knight"
+            return knight(space_start, space_end)
+        when "bishop"
+            return bishop(space_start, space_end)
+        when "queen"
+            return queen(space_start, space_end)
+        end
+
+        false
+    end
+
+    def pawn_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+
+        
+        color = start.piece.color
+        x_dist = start.x - finish.x
+
+        (color == white)? (y_dist = start.y - finish.y) : (y_dist = finish.y - start.y)
+
+        return true if (x_dist == 1) && (y_dist == 1) && (finish.piece)
+        return true if (x_dist == 0) && (y_dist == 2) && (finish.piece == nil) && (start.piece.num_moves == 0)
+        return true if (x_dist == 0) && (y_dist == 1) && (finish.piece == nil)
+        return false
+    end
+
+
+    
     #TODO: rook_move
     #TODO: knight_move
     #TODO: bishop_move
