@@ -165,30 +165,50 @@ RSpec.describe Chess do
         end
     end
 
-    # describe "#rook_move" do 
-    #     subject{ described_class.new }
-    #     context "when a rook is called" do
-    #         it "should be able to move vertically" do
-    #             Board.find_space('a2').delete
-    #             expect(subject.rook_move('a1', 'a4')).to be true
-    #         end
-    #         it "should be able to move horizontally" do
-    #             Board.find_space('a2').delete
-    #             subject.move_piece('a1', 'a4')
-    #             expect(subject.rook_move('a4', 'c4')).to be true
-    #         end
+    describe "#rook_move" do 
+        context "when a rook is called" do
+            it "should be able to move vertically" do
+                chess = described_class.new
+                chess.build_board
+                chess.build_pieces
+                Board.find_space('a2').delete
+                start = Board.find_space('a1')
+                finish = Board.find_space('a4')
+                expect(subject.rook_move(start, finish)).to be true
+            end
+            it "should be able to move horizontally" do
+                chess = described_class.new
+                chess.build_board
+                chess.build_pieces
+                start = Board.find_space('a1')
+                middle = Board.find_space('a4')
+                finish = Board.find_space('c4')
+                subject.move_piece(start, middle)
+                expect(subject.rook_move(middle, finish)).to be true
+            end
 
-    #         it "should not be able to move other than above" do
-    #             subject.move_piece('a1', 'a4')
-    #             expect(subject.rook_move('a4', 'c5')).to be false
-    #         end
+            it "should not be able to move other than above" do
+                chess = described_class.new
+                chess.build_board
+                chess.build_pieces
+                start = Board.find_space('a1')
+                middle = Board.find_space('a4')
+                finish = Board.find_space('c5')
+                subject.move_piece(start, middle)
+                expect(subject.rook_move(middle, finish)).to be false
+            end
 
-    #         it "should not move past any peices" do
-    #             expect(subject.rook_move('a1', 'a4')).to be false
-    #         end
+            it "should not move past any peices" do
+                chess = described_class.new
+                chess.build_board
+                chess.build_pieces
+                start = Board.find_space('a1')
+                finish = Board.find_space('a4')
+                expect(subject.rook_move(start, finish)).to be false
+            end
 
-    #     end
-    # end
+        end
+    end
 
     # describe "bishop_move" do
     #     subject{ described_class.new }

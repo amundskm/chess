@@ -182,21 +182,45 @@ class Chess
         
         color = start.piece.color
         x_dist = start.x - finish.x
-        
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y) 
+
         return true if (x_dist == 1) && (y_dist == 1) && (finish.piece)
         return true if (x_dist == 0) && (y_dist == 2) && (finish.piece == nil) && (start.piece.num_moves == 0)
         return true if (x_dist == 0) && (y_dist == 1) && (finish.piece == nil)
         return false
     end
 
+    def rook_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
 
-    
-    #TODO: rook_move
+        return true if (x_dist == 0) && no_jump(start, finish) && (finish.piece.color != color)
+        return true if (y_dist == 0) && no_jump(start, finish) && (finish.piece.color != color)
+        return false
+    end
+
+    def bishop_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+
+        return true if (x_dist.abs == y_dist.abs) && no_jump(start, finish) && (finish.piece.color != color)
+    end
+
+    def no_jump(start, finish)
+        true #TODO: Actually write this
+    end 
+
     #TODO: knight_move
     #TODO: bishop_move
     #TODO: queen_move
     #TODO: king_move
+    #TODO: jumpstart
 end
 
 
