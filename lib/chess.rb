@@ -16,15 +16,22 @@ end
 class Board
     #create a chess board, each space has a name, coordiates, and a piece
     attr_accessor :piece, :spaces
-    attr_reader :name, :x, :y
-    @@spaces = []
+    attr_reader :name, :x, :y, :touching
+    
     def initialize(name, x, y)
         @name = name
         @x = x
         @y = y
         @piece = nil
         @@spaces << self
+        @touching = []
     end
+
+    def get_touching
+        @touching
+    end
+
+
 
     def self.empty
         @@spaces = []
@@ -44,6 +51,12 @@ class Board
         end
     end
 
+    def self.find_space_at(x,y)
+        @@spaces.each do |space|
+            return space if (space.x == x && space.y == y)
+        end
+    end
+
     def self.get_spaces
         @@spaces
     end
@@ -53,6 +66,9 @@ class Chess
     #create new game of chess
     def initialize
         Board.empty
+        build_board
+        build_pieces
+        #connect_spaces
     end
 
     def build_board
@@ -97,6 +113,16 @@ class Chess
         end
     end
 
+    def connect_spaces
+        Board.get_spaces.each do |space|
+            [-1,0,1].each do |x|
+                [-1,0,1].each do |y|
+                    @touching << Board.find_space_at(x,y) unless (x == 0 and y == 0)
+                end
+            end
+        end
+    end
+
         #TODO draw board should actually create a map of the board in the command prompt
     # def draw_board
     #     Board.get_spaces.each do |space|
@@ -110,11 +136,9 @@ class Chess
     # end
 
     def move_piece(start, finish)
-        piece = start.piece
-        piece.move
+        finish.piece = start.piece
         start.delete
-        finish.piece = piece
-
+        finish.piece.move
     end
 
     # def gameplay
@@ -185,7 +209,7 @@ class Chess
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y) 
 
         return true if (x_dist == 1) && (y_dist == 1) && (finish.piece)
-        return true if (x_dist == 0) && (y_dist == 2) && (finish.piece == nil) && (start.piece.num_moves == 0)
+        return true if (x_dist == 0) && (y_dist == 2) && (no_jump(start,finish)) && (finish.piece == nil) && (start.piece.num_moves == 0)
         return true if (x_dist == 0) && (y_dist == 1) && (finish.piece == nil)
         return false
     end
@@ -193,12 +217,13 @@ class Chess
     def rook_move(start, finish)
         # INPUT: start = starting space, finish = ending space
         # OUTPUT: boolean if it is a legal move
+
         color = start.piece.color
         x_dist = start.x - finish.x
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
 
-        return true if (x_dist == 0) && no_jump(start, finish) && (finish.piece.color != color)
-        return true if (y_dist == 0) && no_jump(start, finish) && (finish.piece.color != color)
+        return true if (x_dist == 0) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return true if (y_dist == 0) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
         return false
     end
 
@@ -209,20 +234,56 @@ class Chess
         x_dist = start.x - finish.x
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
 
-        return true if (x_dist.abs == y_dist.abs) && no_jump(start, finish) && (finish.piece.color != color)
+        return true if (x_dist.abs == y_dist.abs) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return false
     end
 
+    def knight_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+
+        return true if (x_dist.abs + y_dist.abs == 3) && (x_dist.abs <= 2) && (y_dist.abs <= 2) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return false
+    end
+
+    def king_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+
+        return true if (x_dist.abs <= 1) && (y_dist.abs <= 1) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return false
+
+    end
+
+    def queen_move(start, finish)
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+
+        return true if (x_dist == 0) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return true if (y_dist == 0) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return true if (x_dist.abs == y_dist.abs) && no_jump(start, finish) && ((finish.piece == nil) ||(finish.piece.color != color))
+        return false
+    end
+    
     def no_jump(start, finish)
-        true #TODO: Actually write this
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
+        color = start.piece.color
+        x_dist = start.x - finish.x
+        (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+
+        return false unless (x_dist == 0) || (y_dist == 0) || (y_dist == x_dist)
+        return true
+
+
     end 
-
-    #TODO: knight_move
-    #TODO: bishop_move
-    #TODO: queen_move
-    #TODO: king_move
-    #TODO: jumpstart
 end
-
-
-                
-
