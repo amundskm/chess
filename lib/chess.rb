@@ -1,11 +1,12 @@
 class Piece
     # Create a chess peices with a name, # of moves, and color
     attr_accessor :num_moves
-    attr_reader :name, :color
-    def initialize(name, color)
+    attr_reader :name, :color, :unicode
+    def initialize(name, color, unicode)
         @name = name
         @color = color
         @num_moves = 0
+        @unicode = unicode
     end
 
     def move
@@ -15,23 +16,23 @@ end
 
 class Board
     #create a chess board, each space has a name, coordiates, and a piece
-    attr_accessor :piece, :spaces
-    attr_reader :name, :x, :y, :touching
+    attr_accessor :piece, :spaces, :children, :parent
+    attr_reader :name, :x, :y, :color
     
-    def initialize(name, x, y)
+    def initialize(name, x, y, color)
         @name = name
         @x = x
         @y = y
         @piece = nil
         @@spaces << self
-        @touching = []
+        @children = []
+        @parent = nil
+        @color = color
     end
 
     def get_touching
         @touching
     end
-
-
 
     def self.empty
         @@spaces = []
@@ -71,69 +72,84 @@ class Chess
         #connect_spaces
     end
 
+    def gameplay
+        cont = false
+        while cont == false
+            ['white','black'].each do |player|
+                cont = game_over
+                return if cont != false
+                draw_board
+                start, finish = get_input(player)
+                move_piece(start, finish) if test_input(start, finish, player)
+            end
+        end
+    end
+
     def build_board
         8.times do |y|
             8.times do |x|
             letter = (x + 97).chr
                 space_name = letter + (y+1).to_s
-                Board.new(space_name, x ,y)
+                if y.even? && x.even?
+                    color = '⬜'
+                elsif y.even? && x.odd?
+                    color = '⬛'
+                elsif y.odd? && x.odd?
+                    color = '⬜'
+                elsif y.odd? && x.even?
+                    color = '⬛'
+                end
+                Board.new(space_name, x ,y, color)
             end
         end
     end
 
     def build_pieces
-        #add black peices to board
-        Board.find_space('a1').add_piece(Piece.new('rook', 'white'))
-        Board.find_space('h1').add_piece(Piece.new('rook', 'white'))
-        Board.find_space('b1').add_piece(Piece.new('knight', 'white'))
-        Board.find_space('g1').add_piece(Piece.new('knight', 'white'))
-        Board.find_space('c1').add_piece(Piece.new('bishop', 'white'))
-        Board.find_space('f1').add_piece(Piece.new('bishop', 'white'))
-        Board.find_space('d1').add_piece(Piece.new('queen', 'white'))
-        Board.find_space('e1').add_piece(Piece.new('king', 'white'))
+        #add white peices to board
+        Board.find_space('a1').add_piece(Piece.new('rook', 'white', '♖'))
+        Board.find_space('h1').add_piece(Piece.new('rook', 'white', '♖'))
+        Board.find_space('b1').add_piece(Piece.new('knight', 'white', '♘'))
+        Board.find_space('g1').add_piece(Piece.new('knight', 'white', '♘'))
+        Board.find_space('c1').add_piece(Piece.new('bishop', 'white', '♗'))
+        Board.find_space('f1').add_piece(Piece.new('bishop', 'white', '♗'))
+        Board.find_space('d1').add_piece(Piece.new('queen', 'white', '♕'))
+        Board.find_space('e1').add_piece(Piece.new('king', 'white', '♔'))
         8.times do |num|
             letter = (num + 97).chr
             name = letter + 2.to_s
-            Board.find_space(name).add_piece(Piece.new('pawn', 'white'))
+            Board.find_space(name).add_piece(Piece.new('pawn', 'white', '♙'))
         end
 
         #add black peices to board
-        Board.find_space('a8').add_piece(Piece.new('rook', 'black'))
-        Board.find_space('h8').add_piece(Piece.new('rook', 'black'))
-        Board.find_space('b8').add_piece(Piece.new('knight', 'black'))
-        Board.find_space('g8').add_piece(Piece.new('knight', 'black'))
-        Board.find_space('c8').add_piece(Piece.new('bishop', 'black'))
-        Board.find_space('f8').add_piece(Piece.new('bishop', 'black'))
-        Board.find_space('d8').add_piece(Piece.new('queen', 'black'))
-        Board.find_space('e8').add_piece(Piece.new('king', 'black'))
+        Board.find_space('a8').add_piece(Piece.new('rook', 'black', '♜'))
+        Board.find_space('h8').add_piece(Piece.new('rook', 'black', '♜'))
+        Board.find_space('b8').add_piece(Piece.new('knight', 'black', '♞'))
+        Board.find_space('g8').add_piece(Piece.new('knight', 'black', '♞'))
+        Board.find_space('c8').add_piece(Piece.new('bishop', 'black', '♝'))
+        Board.find_space('f8').add_piece(Piece.new('bishop', 'black', '♝'))
+        Board.find_space('d8').add_piece(Piece.new('queen', 'black', '♛'))
+        Board.find_space('e8').add_piece(Piece.new('king', 'black', '♚'))
         8.times do |num|
             letter = (num + 97).chr
             name = letter + 7.to_s
-            Board.find_space(name).add_piece(Piece.new('pawn', 'black'))
+            Board.find_space(name).add_piece(Piece.new('pawn', 'black', '♟'))
         end
     end
 
-    def connect_spaces
-        Board.get_spaces.each do |space|
-            [-1,0,1].each do |x|
-                [-1,0,1].each do |y|
-                    @touching << Board.find_space_at(x,y) unless (x == 0 and y == 0)
+    def draw_board
+        8.times do |y|
+            line = ''
+            8.times do |x|
+                space = Board.find_space_at(x,y)
+                if space.piece != nil
+                    line += " #{space.piece.unicode}"
+                else
+                    line += " #{space.color}"
                 end
             end
+            puts line
         end
     end
-
-        #TODO draw board should actually create a map of the board in the command prompt
-    # def draw_board
-    #     Board.get_spaces.each do |space|
-    #         if space.piece
-    #             puts "#{space.piece.name}, #{space.piece.color}" 
-    #         else
-    #             puts "empty"
-    #         end
-
-    #     end
-    # end
 
     def move_piece(start, finish)
         finish.piece = start.piece
@@ -141,25 +157,13 @@ class Chess
         finish.piece.move
     end
 
-    # def gameplay
-    #     cont = false
-    #     while cont == false
-    #         [1,2].each do |player|
-    #             cont = game_over
-    #             break if cont != false
-    #             draw_board
-    #             add_entry(get_input(player), player)
-    #         end
-    #     end
-    #     return cont
-    # end
 
-    def get_input
+    def get_input(player)
         # INPUT: none
         # OUTPUT: 2 part string array, first part the space the player wants move from, second
         # part the splace the player wants to move to.
         while true
-            puts "what space would you like to move and where"
+            puts "#{player} what space would you like to move and where"
             puts "input in the format <space_name> to <space_name>"
             puts "example: a2 to a3"
             #input= gets.chomp
@@ -264,6 +268,8 @@ class Chess
     end
 
     def queen_move(start, finish)
+        # INPUT: start = starting space, finish = ending space
+        # OUTPUT: boolean if it is a legal move
         color = start.piece.color
         x_dist = start.x - finish.x
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
@@ -277,13 +283,36 @@ class Chess
     def no_jump(start, finish)
         # INPUT: start = starting space, finish = ending space
         # OUTPUT: boolean if it is a legal move
+        
         color = start.piece.color
         x_dist = start.x - finish.x
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
+        piece_path = []
+        if x_dist == 0
+            (start.y..finish.y).each do |y|
+                piece_path <<  Board.find_space_at(start.x, y)
+            end
+        elsif y_dist == 0
+            (start.x..finish.x).each do |x|
+                piece_path <<  Board.find_space_at(x, start.y)
+            end
+        elsif y_dist.abs == x_dist.abs
+            (start.x..finish.x).each do |x|
+                piece_path <<  Board.find_space_at(x, start.y + (x - start.x))
+            end
+        else 
+            return false
+        end
 
-        return false unless (x_dist == 0) || (y_dist == 0) || (y_dist == x_dist)
-        return true
-
-
+        piece_path.each_with_index do |space, index|
+            if (index != 0) && (index != piece_path.length - 1)
+                if space.piece != nil
+                    return false 
+                end
+            end
+        end
+        
+        true
     end 
+
 end
