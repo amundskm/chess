@@ -1,17 +1,33 @@
 class Piece
     # Create a chess peices with a name, # of moves, and color
-    attr_accessor :num_moves
+    attr_accessor :num_moves, :white_pieces, :black_pieces
     attr_reader :name, :color, :unicode
+
+    @@white_pieces = []
+    @@black_pieces = []
+
     def initialize(name, color, unicode)
         @name = name
         @color = color
         @num_moves = 0
-        @unicode = unicode
+        @unicode = unicode   
+        @@white_pieces << self if color == 'white'
+        @@black_pieces << self if color == 'black'
     end
 
     def move
         @num_moves += 1
     end
+
+    def self.get_black_pieces
+        @@black_pieces
+    end
+
+    def self.get_white_pieces
+        @@white_pieces
+    end
+
+    
 end
 
 class Board
@@ -24,10 +40,11 @@ class Board
         @x = x
         @y = y
         @piece = nil
-        @@spaces << self
         @children = []
         @parent = nil
         @color = color
+
+        @@spaces << self
     end
 
     def get_touching
@@ -58,6 +75,14 @@ class Board
         end
     end
 
+    def self.find_piece(piece, color)
+        @@spaces.each do |space|
+            if space.piece != nil
+                return space if (space.piece.name == piece) && (space.piece.color == color)
+            end
+        end
+    end
+
     def self.get_spaces
         @@spaces
     end
@@ -69,18 +94,31 @@ class Chess
         Board.empty
         build_board
         build_pieces
-        #connect_spaces
+        gameplay
     end
 
     def gameplay
-        cont = false
-        while cont == false
+
+        while true
             ['white','black'].each do |player|
-                cont = game_over
-                return if cont != false
                 draw_board
-                start, finish = get_input(player)
-                move_piece(start, finish) if test_input(start, finish, player)
+                while true
+                    start, finish = get_input(player)
+                    if test_input(start, finish, player)
+                        unless check(player)
+                            start_space = Board.find_space(start)
+                            finish_space = Board.find_space(finish)
+                            move_piece(start_space, finish_space)
+                            break
+                        end
+                    else
+                        puts "That is not a legal move"
+                    end
+                end
+                    
+                (player == 'white')? (color = 'black') : (color = 'white')
+                return if checkmate(check(color), color)
+
             end
         end
     end
@@ -106,12 +144,12 @@ class Chess
 
     def build_pieces
         #add white peices to board
-        Board.find_space('a1').add_piece(Piece.new('rook', 'white', '♖'))
-        Board.find_space('h1').add_piece(Piece.new('rook', 'white', '♖'))
-        Board.find_space('b1').add_piece(Piece.new('knight', 'white', '♘'))
-        Board.find_space('g1').add_piece(Piece.new('knight', 'white', '♘'))
-        Board.find_space('c1').add_piece(Piece.new('bishop', 'white', '♗'))
-        Board.find_space('f1').add_piece(Piece.new('bishop', 'white', '♗'))
+        Board.find_space('a1').add_piece(Piece.new('rook1', 'white', '♖'))
+        Board.find_space('h1').add_piece(Piece.new('rook2', 'white', '♖'))
+        Board.find_space('b1').add_piece(Piece.new('knight1', 'white', '♘'))
+        Board.find_space('g1').add_piece(Piece.new('knight2', 'white', '♘'))
+        Board.find_space('c1').add_piece(Piece.new('bishop1', 'white', '♗'))
+        Board.find_space('f1').add_piece(Piece.new('bishop2', 'white', '♗'))
         Board.find_space('d1').add_piece(Piece.new('queen', 'white', '♕'))
         Board.find_space('e1').add_piece(Piece.new('king', 'white', '♔'))
         8.times do |num|
@@ -121,12 +159,12 @@ class Chess
         end
 
         #add black peices to board
-        Board.find_space('a8').add_piece(Piece.new('rook', 'black', '♜'))
-        Board.find_space('h8').add_piece(Piece.new('rook', 'black', '♜'))
-        Board.find_space('b8').add_piece(Piece.new('knight', 'black', '♞'))
-        Board.find_space('g8').add_piece(Piece.new('knight', 'black', '♞'))
-        Board.find_space('c8').add_piece(Piece.new('bishop', 'black', '♝'))
-        Board.find_space('f8').add_piece(Piece.new('bishop', 'black', '♝'))
+        Board.find_space('a8').add_piece(Piece.new('rook1', 'black', '♜'))
+        Board.find_space('h8').add_piece(Piece.new('rook2', 'black', '♜'))
+        Board.find_space('b8').add_piece(Piece.new('knight1', 'black', '♞'))
+        Board.find_space('g8').add_piece(Piece.new('knight2', 'black', '♞'))
+        Board.find_space('c8').add_piece(Piece.new('bishop1', 'black', '♝'))
+        Board.find_space('f8').add_piece(Piece.new('bishop2', 'black', '♝'))
         Board.find_space('d8').add_piece(Piece.new('queen', 'black', '♛'))
         Board.find_space('e8').add_piece(Piece.new('king', 'black', '♚'))
         8.times do |num|
@@ -166,11 +204,12 @@ class Chess
             puts "#{player} what space would you like to move and where"
             puts "input in the format <space_name> to <space_name>"
             puts "example: a2 to a3"
-            #input= gets.chomp
-            input = "a2 to a3"
+            input= gets.chomp
             check = input.scan(/(\w)(\d) to (\w)(\d)/).flatten
-            start = check[0] + check[1]
-            finish = check[2] + check[2]
+            start_string = check[0] + check[1]
+            finish_string = check[2] + check[3]
+            start = Board.find_space(start_string)
+            finish = Board.find_space(finish_string)
             return start, finish if check.length == 4
             puts "what you have entered does not have the correct format. Please try again."
         end
@@ -180,25 +219,20 @@ class Chess
         # INPUT: start = string, name of starting space finish = string, name of ending space
         # OUTPUT: returns false if it is not a legal move
 
-        space_start = Board.find_space(start)
-        space_end = Board.find_space(finish)
-        piece = space_start.piece
+        piece = start.piece
 
-        unless piece.color == player
-            return false
-        end
+        return false unless piece.color == player
 
-        case piece.name
-        when "pawn"
-            return pawn_move(space_start, space_end)
-        when "rook"
-            return rook(space_start, space_end)
-        when "knight"
-            return knight(space_start, space_end)
-        when "bishop"
-            return bishop(space_start, space_end)
-        when "queen"
-            return queen(space_start, space_end)
+        if piece.name.include?  "pawn"
+            return pawn_move(start, finish)
+        elsif piece.name.include?  "rook"
+            return rook_move(start, finish)
+        elsif piece.name.include?  "knight"
+            return knight_move(start, finish)
+        elsif piece.name.include?  "bishop"
+            return bishop_move(start, finish)
+        elsif piece.name.include?  "queen"
+            return queen_move(start, finish)
         end
 
         false
@@ -283,8 +317,75 @@ class Chess
     def no_jump(start, finish)
         # INPUT: start = starting space, finish = ending space
         # OUTPUT: boolean if it is a legal move
+ 
+        x_dist = (start.x - finish.x).abs + 1
+        y_dist = (start.y - finish.y).abs + 1
+        piece_path = []
+
+        if x_dist == 0
+            (start.y..finish.y).each do |y|
+                piece_path <<  Board.find_space_at(start.x, start.y + y)
+            end
+        elsif y_dist == 0
+            (start.x..finish.x).each do |x|
+                piece_path <<  Board.find_space_at(start.x + x, start.y)
+            end
+        elsif y_dist.abs == x_dist.abs
+            (start.x - finish.x  >= 0)? (x_move = -1) : (x_move = 1)
+            (start.y - finish.y >= 0)? (y_move = -1) : (y_move = 1)
+            num = x_dist.abs
+            num.times do |move|
+                piece_path <<  Board.find_space_at(start.x + x_move * move, start.y + y_move*move)
+            end
+            
+        else 
+            return false
+        end
+
+        piece_path.each_with_index do |space, index|
+            if (index != 0) && (index != piece_path.length + 1)
+                if space.piece != nil
+                    return false 
+                end
+            end
+        end
         
-        color = start.piece.color
+        true
+    end 
+
+    def check(color)
+        #INPUTS: color
+        #OUTPUTS: space that has king in check, or false
+
+        # if the player moves the piece from its current position to the new position, will the king be vulnerable to attack?
+        king = Board.find_piece('king', color)
+
+        if color == 'white'
+            pieces = Piece.get_black_pieces
+            check_color = 'black'
+        else
+            pieces = Piece.get_white_pieces
+            check_color = 'white'
+        end
+
+
+        pieces.each do |piece|
+            space = Board.find_piece(piece.name, check_color)
+            if test_input(space, king, check_color)
+                puts 'game over'
+                return space 
+            end
+        end
+
+        false
+    end
+
+    def checkmate(check_space, color)
+        #Input: space that has king in check, color of attacking player
+        #output: boolean if game is over or now
+        return false if check_space == false
+        start = check_space
+        finish = Board.find_piece('king', color)
         x_dist = start.x - finish.x
         (color == 'white')? (y_dist = finish.y - start.y) : (y_dist = start.y - finish.y)
         piece_path = []
@@ -300,19 +401,23 @@ class Chess
             (start.x..finish.x).each do |x|
                 piece_path <<  Board.find_space_at(x, start.y + (x - start.x))
             end
-        else 
-            return false
         end
 
-        piece_path.each_with_index do |space, index|
-            if (index != 0) && (index != piece_path.length - 1)
-                if space.piece != nil
-                    return false 
-                end
+        if color == 'white'
+            pieces = Piece.get_white_pieces
+        else
+            pieces = Piece.get_black_pieces
+        end
+
+        pieces.each do |piece|
+            check = Board.find_piece(piece.name, color)
+            piece_path.each do |space|
+                return false if test_input(check, space, color)
             end
         end
-        
-        true
-    end 
 
+        true
+    end
 end
+
+new_game = Chess.new

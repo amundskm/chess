@@ -71,26 +71,26 @@ require '../lib/chess.rb'
 RSpec.describe Chess do
     
 
-    describe "build_board" do
-        context "when the game is started, create all the spaces on the board" do
-            subject{ described_class.new }
-            it "should create 64 spaces 8 X 8" do
-                subject
-                expect(Board.get_spaces.length).to eq 64
-            end
-        end
-    end
+    # describe "build_board" do
+    #     context "when the game is started, create all the spaces on the board" do
+    #         subject{ described_class.new }
+    #         it "should create 64 spaces 8 X 8" do
+    #             subject
+    #             expect(Board.get_spaces.length).to eq 64
+    #         end
+    #     end
+    # end
 
-    describe "build_pieces" do
-        context "when the game is started, create and place all subject peices on correct spaces" do
-            subject{ described_class.new }
-            it "should put a rook on 'a1'" do
-                subject
-                space = Board.find_space('a1')
-                expect(space.piece.name).to eq 'rook'
-            end
-        end
-    end
+    # describe "build_pieces" do
+    #     context "when the game is started, create and place all subject peices on correct spaces" do
+    #         subject{ described_class.new }
+    #         it "should put a rook on 'a1'" do
+    #             subject
+    #             space = Board.find_space('a1')
+    #             expect(space.piece.name).to eq 'rook'
+    #         end
+    #     end
+    # end
 
     # describe "move_piece" do
     #     subject{ described_class.new }
@@ -414,55 +414,54 @@ RSpec.describe Chess do
     #     end
     # end
 
-    # describe "#queen_move" do
-    #     subject{ described_class.new }
-    #     context "when a queen is called" do
-    #         it "should move horiztonally" do
-    #             subject
-    #             start = Board.find_space('d1')
-    #             middle = Board.find_space('d4')
-    #             subject.move_piece(start, middle)
-    #             right = Board.find_space('h4')
-    #             left = Board.find_space('a4')
-    #             expect(subject.queen_move(middle, left)).to be true
-    #             expect(subject.queen_move(middle, right)).to be true
-    #         end
+    describe "#queen_move" do
+        subject{ described_class.new }
+        context "when a queen is called" do
+            it "should move horiztonally" do
+                subject
+                start = Board.find_space('d1')
+                middle = Board.find_space('h5')
+                subject.move_piece(start, middle)
+                right = Board.find_space('e8')
+                left = Board.find_space('a5')
+                expect(subject.queen_move(middle, right)).to be false
+            end
 
-    #         it "should move vertically" do
-    #             subject
-    #             start = Board.find_space('d1')
-    #             middle = Board.find_space('d4')
-    #             subject.move_piece(start, middle)
-    #             up = Board.find_space('d6')
-    #             down = Board.find_space('d3')
-    #             expect(subject.queen_move(middle, up)).to be true
-    #             expect(subject.queen_move(middle, down)).to be true
-    #         end
+            # it "should move vertically" do
+            #     subject
+            #     start = Board.find_space('d1')
+            #     middle = Board.find_space('d4')
+            #     subject.move_piece(start, middle)
+            #     up = Board.find_space('d6')
+            #     down = Board.find_space('d3')
+            #     expect(subject.queen_move(middle, up)).to be true
+            #     expect(subject.queen_move(middle, down)).to be true
+            # end
 
-    #         it "should move diagonally" do
-    #             subject
-    #             start = Board.find_space('d1')
-    #             middle = Board.find_space('d4')
-    #             subject.move_piece(start, middle)
-    #             up_left = Board.find_space('f6')
-    #             up_right = Board.find_space('b6')
-    #             down_left = Board.find_space('e3')
-    #             down_right = Board.find_space('c3')
-    #             expect(subject.queen_move(middle, up_right)).to be true
-    #             expect(subject.queen_move(middle, up_left)).to be true
-    #             expect(subject.queen_move(middle, down_right)).to be true
-    #             expect(subject.queen_move(middle, down_left)).to be true
-    #         end
+            # it "should move diagonally" do
+            #     subject
+            #     start = Board.find_space('d1')
+            #     middle = Board.find_space('d4')
+            #     subject.move_piece(start, middle)
+            #     up_left = Board.find_space('f6')
+            #     up_right = Board.find_space('b6')
+            #     down_left = Board.find_space('e3')
+            #     down_right = Board.find_space('c3')
+            #     expect(subject.queen_move(middle, up_right)).to be true
+            #     expect(subject.queen_move(middle, up_left)).to be true
+            #     expect(subject.queen_move(middle, down_right)).to be true
+            #     expect(subject.queen_move(middle, down_left)).to be true
+            # end
 
-    #         it "should not move past any peices" do 
-    #             subject
-    #             start = Board.find_space('d1')
-    #             finish = Board.find_space('d4')
-    #             expect(subject.queen_move(start, finish)).to be false
-    #         end
+            # it "should not move past any peices" do 
+            #     subject
+            #     start = Board.find_space('d1')
+            #     finish = Board.find_space('d4')
+            #     expect(subject.queen_move(start, finish)).to be false
+            # end
 
-    #     end
-    # end
+        end
+    end
 
     # describe "#test_input" do
     #     subject{ described_class.new }
@@ -488,26 +487,34 @@ RSpec.describe Chess do
     # describe "check" do
     #     subject{ described_class.new }
     #     context "when a king can be attacked on the next turn, but can escape a king is in check" do
-    #         it "should return the king color if the king can be attacked" do
-    #             expect(subject.check).to be false
-    #             subject.move_piece('e1', 'e6')
-    #             expect(subject.check).to eq 'white'
+    #         it "should be true if the king can be attacked" do
+    #             expect(subject.check('white')).to be false
+    #             Board.find_space('e2').delete
+    #             start = Board.find_space('d8')
+    #             finish = Board.find_space('e4')
+    #             subject.move_piece(start, finish)
+    #             expect(subject.check('white')).to eq finish
     #         end
     #     end
+
     # end
 
     # describe "checkmate" do
     #     subject{ described_class.new }
     #     context "when a king can be attacked on the next, and can't escape turn a king is in check" do
     #         it "should return the king color if the king can be attacked" do
-    #             expect(subject.check).to be false
     #             Board.find_space('e7').delete
-    #             subject.move_piece('d1', 'e7')
-    #             subject.move_pieve('a1', 'e6')
-    #             expect(subject.check).to eq 'black'
+    #             queen_start = Board.find_space('d1')
+    #             queen_finish = Board.find_space('e7')
+    #             rook_start = Board.find_space('a1')
+    #             rook_finish = Board.find_space('e6')
+    #             subject.move_piece(queen_start, queen_finish)
+    #             subject.move_piece(rook_start, rook_finish)
+    #             expect(subject.checkmate(queen_finish, 'black')).to be true
     #         end
     #     end
     # end
 
 end
+
 
