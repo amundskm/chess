@@ -2,7 +2,6 @@ include Math
 require "../lib/board.rb"
 require "../lib/piece.rb"
 
-
 class Chess
     attr_accessor :spaces
     @@spaces = []
@@ -106,6 +105,7 @@ class Chess
     end
 
     def gameplay
+        puts "if the symbols do not show up in the command prompt, change you command prompt font to NSimSum"
         while true
             ['white', 'black'].each do |player_color|
                 draw_board
